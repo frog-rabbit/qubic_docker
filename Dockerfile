@@ -1,4 +1,4 @@
-FROM vbox-with-extpack:latest
+FROM ghcr.io/icyblob/vbox-with-extpack:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 

@@ -50,7 +50,9 @@ If your `Qubic.vhd` does **not** already contain the correct epoch files, run th
 
 This script will do thr `losetup` to mount the VHD, remove old epoch/system files, optionally copy `Ep*.zip`, `Qubic.efi`, and `spectrum.000` if you provide them, then unmount.
 
-### 2. Build the **Base Docker** Image
+### 2. Build the **Base Docker** Image (Optional if use prebuilt base docker image)
+
+**Important**: Skip this step if you use the prebuilt docker image [ghcr.io/icyblob/vbox-with-extpack:latest](https://github.com/users/icyblob/packages/container/package/vbox-with-extpack)
 
 Inside the `base_docker/` directory, there is a `Dockerfile`. This base Dockerfile typically installs VirtualBox but **does not** install the Extension Pack. You can build it like so:
 
@@ -61,7 +63,9 @@ docker build -t vbox-base .
 
 ### 3. Install the VirtualBox Extension Pack **Manually** (Optional)
 
-The purpose of installing VirtualBox Extension Pack is to view the Qubic Node's runtime output line by line, and to interact with the Qubic Node from the host machine.
+**Important**: Skip this step if you use the prebuilt docker image [ghcr.io/icyblob/vbox-with-extpack:latest](https://github.com/users/icyblob/packages/container/package/vbox-with-extpack)
+
+The purpose of installing VirtualBox Extension Pack is to view the Qubic Node's runtime output line by line, and to interact with the Qubic Node from the host machine. Skip this step if you don't want to interact with the VM instance or view its outputs.
 
 Because the Extension Pack license must be accepted interactively, you need to:
 
@@ -103,7 +107,13 @@ At the top of your main `Dockerfile` (in the root of this repo) you should inclu
 FROM vbox-with-extpack:latest
 ```
 
-If you skipped step 3, then just use:
+Alternatively, you can use the prebuilt image here [ghcr.io/icyblob/vbox-with-extpack:latest](https://github.com/users/icyblob/packages/container/package/vbox-with-extpack)
+
+```dockerfile
+FROM ghcr.io/icyblob/vbox-with-extpack:latest
+```
+
+If you skipped step 3 and don't want to interact with the VM instance and view its outputs, then just use:
 
 ```dockerfile
 FROM vbox-base
