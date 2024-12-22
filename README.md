@@ -158,7 +158,7 @@ This should show you the headless VM console, assuming the Extension Pack is ins
 From your **host** or another machine (depending on your network setup), you can connect to the Qubic node:
 
 ```bash
-broadcastComputorTestnet <node_ip> <epoch_number> <node port>
+./broadcastComputorTestnet <node_ip> <epoch_number> <node port>
 ```
 
 Change your node port accordingly, ie. 31841.
