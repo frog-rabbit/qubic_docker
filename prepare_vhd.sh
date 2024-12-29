@@ -25,6 +25,7 @@ VHD_PATH="$2"
 EPOCH_ZIP="$3"      # optional
 EFI_FILE="$4"       # optional
 SPECTRUM_FILE="$5"  # optional
+NO_CLEAN="$6"       # optional
 
 # 2. Check required args
 if [[ -z "$EPOCH_NUMBER" || -z "$VHD_PATH" ]]; then
@@ -43,6 +44,7 @@ echo " VHD_PATH     = $VHD_PATH"
 echo " EPOCH_ZIP    = ${EPOCH_ZIP:-<not provided>}"
 echo " EFI_FILE     = ${EFI_FILE:-<not provided>}"
 echo " SPECTRUM_FILE= ${SPECTRUM_FILE:-<not provided>}"
+echo " NO_CLEAN= ${NO_CLEAN:-<not provided>}"
 echo " Mount point  = $MOUNT_DIR"
 echo "=========================================="
 
@@ -61,9 +63,13 @@ PARTITION="${LOOP_DEVICE}p1"
 echo "Mounting to $MOUNT_DIR..."
 sudo mount "$PARTITION" "$MOUNT_DIR"
 
-# 6. Remove old score/system files
-echo "Removing old score.* and system* files (ignore errors if missing)..."
-sudo rm -f "$MOUNT_DIR"/score.* "$MOUNT_DIR"/system* 2>/dev/null || true
+# 6. (Optional) Remove old score/system files unless NO_CLEAN is set
+if [[ -n "$NO_CLEAN" ]]; then
+  echo "NO_CLEAN is set. Skipping removal of score.* and system* files..."
+else
+  echo "Removing old score.* and system* files (ignore errors if missing)..."
+  sudo rm -f "$MOUNT_DIR"/score.* "$MOUNT_DIR"/system* 2>/dev/null || true
+fi
 
 # 7. (Optional) Copy Qubic.efi
 if [[ -n "$EFI_FILE" && -f "$EFI_FILE" ]]; then
