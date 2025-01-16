@@ -1,39 +1,59 @@
 # Qubic Testnet Docker
 
-This repository contains files necessary for launching a Qubic testnet node **inside a Docker**.
+This repository contains all the scripts and Dockerfiles necessary for launching a Qubic testnet node via Docker.
 
-## File Structure
+# Quick Start
 
+## Prerequisites
+	1.	Docker (with --privileged support).
+	2.	VirtualBox (7.1.x) installed on the host, ensuring kernel modules are loaded.
+	3.	A pre-built Qubic.vhd. See the Qubic-Node.md docs for how to create it.
+	4.	Optional: Ep<epoch>.zip, Qubic.efi, spectrum.000 if you need to update the VHD for your testnet.
+
+## Run ./run.sh
+Use run.sh to launch everything with a single command:
+
+```commandline
+./run.sh <EPOCH_NUMBER> <QUBIC_VHD> <PORT> <MEMORY_MB> <CPUS> [EP_ZIP] [QUBIC_EFI] [SPECTRUM_000]
 ```
-.
-├── auto_tick.py
-├── base_docker
-│   └── Dockerfile
-├── broadcastComputorTestnet
-├── Dockerfile
-├── entrypoint.sh
-├── Ep<epoch number>.zip # Or any Ep*.zip for your epoch. Must match pattern [e|E]p<epoch>.zip
-├── libfourq-qubic.so
-├── prepare_vhd.sh
-├── qubic-cli
-├── Qubic.efi
-├── Qubic.vhd
-├── README.md
-└── spectrum.000
+where:
+
+	1.	EPOCH_NUMBER (e.g. 145)
+	2.	QUBIC_VHD (e.g. /home/user/some/path/Qubic.vhd)
+	3.	PORT (e.g. 31841)
+	4.	MEMORY_MB (e.g. 120243) – memory in MB
+	5.	CPUS (e.g. 29) – how many CPU cores
+	6.	EP_ZIP (optional) – full path to [e|E]p<epoch>.zip
+	7.	QUBIC_EFI (optional) – full path to Qubic.efi
+	8.	SPECTRUM_000 (optional) – full path to spectrum.000
+
+## Example
+
+```commandline
+./run.sh 145 /home/user/some/path/Qubic.vhd 31841 120243 29 \
+  /home/user/epfiles/Ep145.zip \
+  /home/user/efi/Qubic.efi \
+  /home/user/000/spectrum.000
 ```
 
-**Important**: In addition to the files in this repo, you must also have:
+What Happens:
 
-1. A **pre-built** `Qubic.vhd` disk image. See [Qubic-Node.md](https://github.com/XARKUR/Qubic/blob/main/Qubic-Node.md) for detailed tutorials. This vhd file must contain the efi directory and all the contract, universe and spectrum files.
-2. The **compiled** `qubic-cli` and its library `libfourq-qubic.so`.
-3. The `broadcastComputorTestnet` binary. (Not packaged here—contact the Qubic team if you need it.)
-4. An **epoch file** in the pattern `[e|E]p<epoch number>.zip`. For example, `Ep140.zip`.
-5. A **pre-compiled** `Qubic.efi` suitable for your hardware or custom setup.
-6. A **testnet-only** `spectrum.000` file (contact the Qubic team for testnet spectrums and seeds).
+	1.	prepare_vhd.sh mounts and updates your .vhd with epoch files, EFI, spectrum if provided.
+	2.	Builds the qubic-docker image.
+	3.	Runs a container that:
+		•	Publishes port 31841 so other nodes can connect.
+		•	Publishes port 5000 for VRDE/RDP.
+		•	Mounts your local Qubic.vhd into /qubic/Qubic.vhd inside the container.
+		•	Sets memory/CPUs for the VirtualBox VM.
 
-Prepare all the necessary files listed here and copy them into this repo.
+## Important: **Version Compatibility**
+	•	The Dockerfile uses VirtualBox 7.1.
+	•	Your host’s VirtualBox kernel modules must also be 7.1 (or a compatible 7.1.x) to avoid errors (e.g., rc=-1912 in hardened mode).
+	•	If your host is not on 7.1, and you can't change the Vbox version in your host, see Manual Approach below to build a matching version inside the docker.
 
----
+# Manual Approach 
+
+If You Need a VBox version in your docker to match the host or you just need the manual steps and build the docker by yourself.
 
 ## Preparation Steps
 
@@ -48,7 +68,7 @@ If your `Qubic.vhd` does **not** already contain the correct epoch files, run th
 - `EPOCH_NUMBER` **and** `Qubic.vhd` are **required**.
 - `EpXXX.zip`, `Qubic.efi`, and `spectrum.000` are **optional**—if not provided, the script will skip them.
 
-This script will do thr `losetup` to mount the VHD, remove old epoch/system files, optionally copy `Ep*.zip`, `Qubic.efi`, and `spectrum.000` if you provide them, then unmount.
+This script will do the `losetup` to mount the VHD, remove old epoch/system files, optionally copy `Ep*.zip`, `Qubic.efi`, and `spectrum.000` if you provide them, then unmount.
 
 ### 2. Build the **Base Docker** Image (Optional if use prebuilt base docker image)
 
@@ -137,7 +157,11 @@ docker run --privileged -it -p 31841:31841/tcp -p 5000:5000/tcp -v $(pwd):/qubic
 - `-p 5000:5000` allows VRDE (RDP) at port 5000 if you want to see the VM console. Only available if you installed the VirtualBox Extension Pack instructed above.
 - `-v $(pwd):/qubic` mounts your host working directory (with `Qubic.vhd`, scripts, etc.) into the container.
 
-### 7. See the Output with RDP (Optional)
+# Final steps (for both approaches)
+
+Both the approach to use ./run.sh or the manual docker build will need these additional steps.
+
+## See the Output with RDP (Optional)
 
 Install `xfreerdp` on your host:
 
@@ -153,7 +177,7 @@ xfreerdp /v:127.0.0.1:5000 /u: /p: /cert:ignore
 
 This should show you the headless VM console, assuming the Extension Pack is installed and VRDE is enabled in `entrypoint.sh`. Now you can even interact with the VM output as if you're running the VM from your host machine. Any keyboard inputs like Esc, F2, F4, F9, etc. will be sent to the VM in the docker.
 
-### 8. Run `broadcastComputorTestnet` & Other Scripts
+## Run `broadcastComputorTestnet` & Other Scripts
 
 From your **host** or another machine (depending on your network setup), you can connect to the Qubic node:
 
@@ -163,7 +187,7 @@ From your **host** or another machine (depending on your network setup), you can
 
 Change your node port accordingly, ie. 31841.
 
-### 9. Run `auto_tick.py` for Consistent Ticks
+## Run `auto_tick.py` for Consistent Ticks
 
 The `auto_tick.py` script ensures ticks happen consistently and seamlessly. Adjust its configuration (e.g., main/aux if you have single node or main/main if you have multiple nodes) and run it:
 
