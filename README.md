@@ -41,16 +41,15 @@ What Happens:
 1. `prepare_vhd.sh` mounts and updates your .vhd with epoch files, EFI, spectrum if provided.
 2. Builds the `qubic-docker` image.
 3. Runs a container that:
-• Publishes `port 31841` so other nodes can connect.
-• Publishes `port 5000` for VRDE/RDP.
-• Mounts your local Qubic.vhd into `/qubic/Qubic.vhd` inside the container.
-• Sets memory/CPUs for the VirtualBox VM.
+  * Publishes `port 31841` so other nodes can connect.
+  * Publishes `port 5000` for VRDE/RDP.
+  * Mounts your local Qubic.vhd into `/qubic/Qubic.vhd` inside the container.
+  * Sets memory/CPUs for the VirtualBox VM.
 
 ## Important: **Version Compatibility**
-
-• The Dockerfile uses VirtualBox 7.1.
-• Your host’s VirtualBox kernel modules must also be 7.1 (or a compatible 7.1.x) to avoid errors (e.g., rc=-1912 in hardened mode).
-• If your host is not on 7.1, and you can't change the Vbox version in your host, see Manual Approach below to build a matching version inside the docker.
+* The Dockerfile uses VirtualBox 7.1.
+* Your host’s VirtualBox kernel modules must also be 7.1 (or a compatible 7.1.x) to avoid errors (e.g., rc=-1912 in hardened mode).
+* If your host is not on 7.1, and you can't change the Vbox version in your host, see Manual Approach below to build a matching version inside the docker.
 
 # Manual Approach 
 
