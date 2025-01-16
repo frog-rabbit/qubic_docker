@@ -2,13 +2,14 @@
 
 This repository contains all the scripts and Dockerfiles necessary for launching a Qubic testnet node via Docker.
 
-# Quick Start
+# Quick Approach with run.sh
 
 ## Prerequisites
-	1.	Docker (with --privileged support).
-	2.	VirtualBox (7.1.x) installed on the host, ensuring kernel modules are loaded.
-	3.	A pre-built Qubic.vhd. See the Qubic-Node.md docs for how to create it.
-	4.	Optional: Ep<epoch>.zip, Qubic.efi, spectrum.000 if you need to update the VHD for your testnet.
+
+1. Docker (with --privileged support).
+2. VirtualBox (7.1.x) installed on the host, ensuring kernel modules are loaded.
+3. A pre-built Qubic.vhd. See the Qubic-Node.md docs for how to create it.
+4. Optional: Ep<epoch>.zip, Qubic.efi, spectrum.000 if you need to update the VHD for your testnet.
 
 ## Run ./run.sh
 Use run.sh to launch everything with a single command:
@@ -18,14 +19,14 @@ Use run.sh to launch everything with a single command:
 ```
 where:
 
-	1.	EPOCH_NUMBER (e.g. 145)
-	2.	QUBIC_VHD (e.g. /home/user/some/path/Qubic.vhd)
-	3.	PORT (e.g. 31841)
-	4.	MEMORY_MB (e.g. 120243) – memory in MB
-	5.	CPUS (e.g. 29) – how many CPU cores
-	6.	EP_ZIP (optional) – full path to [e|E]p<epoch>.zip
-	7.	QUBIC_EFI (optional) – full path to Qubic.efi
-	8.	SPECTRUM_000 (optional) – full path to spectrum.000
+1. `EPOCH_NUMBER` (e.g. 145)
+2. `QUBIC_VHD` (e.g. /home/user/some/path/Qubic.vhd)
+3. `PORT` (e.g. 31841)
+4. `MEMORY_MB` (e.g. 120243) – memory in MB
+5. `CPUS` (e.g. 29) – how many CPU cores
+6. `EP_ZIP` (optional) – full path to [e|E]p<epoch>.zip
+7. `QUBIC_EFI` (optional) – full path to Qubic.efi
+8. `SPECTRUM_000` (optional) – full path to spectrum.000
 
 ## Example
 
@@ -37,19 +38,19 @@ where:
 ```
 
 What Happens:
-
-	1.	prepare_vhd.sh mounts and updates your .vhd with epoch files, EFI, spectrum if provided.
-	2.	Builds the qubic-docker image.
-	3.	Runs a container that:
-		•	Publishes port 31841 so other nodes can connect.
-		•	Publishes port 5000 for VRDE/RDP.
-		•	Mounts your local Qubic.vhd into /qubic/Qubic.vhd inside the container.
-		•	Sets memory/CPUs for the VirtualBox VM.
+1. `prepare_vhd.sh` mounts and updates your .vhd with epoch files, EFI, spectrum if provided.
+2. Builds the `qubic-docker` image.
+3. Runs a container that:
+• Publishes `port 31841` so other nodes can connect.
+• Publishes `port 5000` for VRDE/RDP.
+• Mounts your local Qubic.vhd into `/qubic/Qubic.vhd` inside the container.
+• Sets memory/CPUs for the VirtualBox VM.
 
 ## Important: **Version Compatibility**
-	•	The Dockerfile uses VirtualBox 7.1.
-	•	Your host’s VirtualBox kernel modules must also be 7.1 (or a compatible 7.1.x) to avoid errors (e.g., rc=-1912 in hardened mode).
-	•	If your host is not on 7.1, and you can't change the Vbox version in your host, see Manual Approach below to build a matching version inside the docker.
+
+• The Dockerfile uses VirtualBox 7.1.
+• Your host’s VirtualBox kernel modules must also be 7.1 (or a compatible 7.1.x) to avoid errors (e.g., rc=-1912 in hardened mode).
+• If your host is not on 7.1, and you can't change the Vbox version in your host, see Manual Approach below to build a matching version inside the docker.
 
 # Manual Approach 
 
