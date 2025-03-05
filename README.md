@@ -13,7 +13,8 @@ This repository contains all the scripts and Dockerfiles necessary for launching
   - [Important: Version Compatibility](#important-version-compatibility)
 - [Manual Approach](#manual-approach)
   - [Preparation Steps](#preparation-steps)
-    - [1. VHD epoch increment preparation](#1-vhd-epoch-increment-preperation)
+    - [0. Create a VHD file](#0-create-a-vhd-file)
+    - [1. VHD epoch increment preparation](#1-vhd-epoch-increment-preparation)
     - [2. Build the Base Docker Image](#2-build-the-base-docker-image-optional-if-use-prebuilt-base-docker-image)
     - [3. Install the VirtualBox Extension Pack Manually](#3-install-the-virtualbox-extension-pack-manually-optional)
     - [4. Change entrypoint.sh as Needed](#4-change-entrypointsh-as-needed)
@@ -53,7 +54,7 @@ If you're connecting to the Qubic node from a remote machine, you'll need approp
 
 1. Docker (with --privileged support).
 2. VirtualBox (7.1.x) installed on the host, ensuring kernel modules are loaded.
-3. A pre-built Qubic.vhd. See the Qubic-Node.md docs for how to create it.
+3. A pre-built Qubic.vhd. [Download Qubic.vhd here](#) or see the Manual Approach section for how to create it.
 4. Optional: Ep<epoch>.zip, Qubic.efi, spectrum.000 if you need to update the VHD for your testnet.
 
 ## Run ./run.sh
@@ -102,7 +103,78 @@ If You Need a VBox version in your docker to match the host or you just need the
 
 ## Preparation Steps
 
-### 1. VHD epoch increment preperation
+### 0. Create a VHD file
+
+If you don't have a Qubic.vhd file yet, you can create one with these commands:
+
+```bash
+# Install required packages
+sudo apt update
+sudo apt install qemu-utils nbd-client
+
+# Create VHD
+VBoxManage createmedium disk --filename /root/qubic_docker/files/Qubic.vhd --size 16384 --format VHD --variant Fixed
+
+# Verify the VHD was created
+VBoxManage showhdinfo /root/qubic_docker/files/Qubic.vhd
+```
+
+You should see output similar to this:
+
+```
+UUID:           2acdd804-b1a7-4ea8-a2ee-f476d835d042
+Parent UUID:    base
+State:          created
+Type:           normal (base)
+Location:       /root/qubic_docker/files/Qubic.vhd
+Storage format: VHD
+Format variant: fixed default
+Capacity:       16384 MBytes
+Size on disk:   16384 MBytes
+Encryption:     disabled
+```
+
+Now format the VHD:
+
+```bash
+# Load the NBD kernel module
+sudo modprobe nbd max_part=8
+
+# Connect the VHD to a network block device
+sudo qemu-nbd --format=vpc --connect=/dev/nbd0 /root/qubic_docker/files/Qubic.vhd
+
+# Check the block device
+lsblk /dev/nbd0
+
+# Create a partition table
+sudo parted /dev/nbd0 --script mklabel msdos
+
+# Create a primary partition
+sudo parted /dev/nbd0 --script mkpart primary fat32 1MiB 100%
+
+# Format the partition with FAT32
+sudo mkfs.vfat -F 32 -n QUBIC /dev/nbd0p1
+
+# Disconnect the network block device
+sudo qemu-nbd --disconnect /dev/nbd0
+
+# Verify the VHD is still intact
+VBoxManage showhdinfo /root/qubic_docker/files/Qubic.vhd
+```
+
+The "Storage format: VHD" should still be visible in the output.
+
+If you need to delete a corrupted VHD, you can use these commands:
+
+```bash
+# Unregister and delete corrupted VHD
+VBoxManage closemedium disk /root/qubic_docker/files/Qubic.vhd --delete
+rm -f /root/qubic_docker/files/Qubic.vhd
+```
+
+Adjust the path `/root/qubic_docker/files/Qubic.vhd` to your preferred location.
+
+### 1. VHD epoch increment preparation
 
 If your `Qubic.vhd` does **not** already contain the correct epoch files, run the `prepare_vhd.sh` script:
 
