@@ -15,7 +15,7 @@ This repository contains all the scripts and Dockerfiles necessary for launching
 Use run.sh to launch everything with a single command:
 
 ```commandline
-./run.sh <EPOCH_NUMBER> <QUBIC_VHD> <PORT> <MEMORY_MB> <CPUS> [EP_ZIP] [QUBIC_EFI] [SPECTRUM_000]
+./run.sh --epoch <EPOCH_NUMBER> --vhd <QUBIC_VHD> --port <PORT> --memory <MEMORY_MB> --cpus <CPUS> [--epzip <EP_ZIP>] [--efi <QUBIC_EFI>] [--spectrum <SPECTRUM_000>]
 ```
 where:
 
@@ -31,10 +31,10 @@ where:
 ## Example
 
 ```commandline
-./run.sh 145 /home/user/some/path/Qubic.vhd 31841 120243 29 \
-  /home/user/epfiles/Ep145.zip \
-  /home/user/efi/Qubic.efi \
-  /home/user/000/spectrum.000
+./run.sh --epoch 145 --vhd /home/user/some/path/Qubic.vhd --port 31841 --memory 120243 --cpus 29 \
+  --epzip /home/user/epfiles/Ep145.zip \
+  --efi /home/user/efi/Qubic.efi \
+  --spectrum /home/user/000/spectrum.000
 ```
 
 What Happens:
