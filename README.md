@@ -2,6 +2,28 @@
 
 This repository contains all the scripts and Dockerfiles necessary for launching a Qubic testnet node via Docker.
 
+## Table of Contents
+- [System Recommendations](#system-recommendations)
+  - [Host Machine Requirements](#host-machine-requirements)
+  - [Remote Connection Options](#remote-connection-options)
+- [Quick Approach with run.sh](#quick-approach-with-runsh)
+  - [Prerequisites](#prerequisites)
+  - [Run ./run.sh](#run-runsh)
+  - [Example](#example)
+  - [Important: Version Compatibility](#important-version-compatibility)
+- [Manual Approach](#manual-approach)
+  - [Preparation Steps](#preparation-steps)
+    - [1. VHD epoch increment preparation](#1-vhd-epoch-increment-preperation)
+    - [2. Build the Base Docker Image](#2-build-the-base-docker-image-optional-if-use-prebuilt-base-docker-image)
+    - [3. Install the VirtualBox Extension Pack Manually](#3-install-the-virtualbox-extension-pack-manually-optional)
+    - [4. Change entrypoint.sh as Needed](#4-change-entrypointsh-as-needed)
+    - [5. Build the Main Docker Image](#5-build-the-main-docker-image)
+    - [6. Run the Main Docker with Port Forwarding](#6-run-the-main-docker-with-port-forwarding)
+- [Final steps](#final-steps-for-both-approaches)
+  - [See the Output with RDP](#see-the-output-with-rdp-optional)
+  - [Run broadcastComputorTestnet & Other Scripts](#run-broadcastcomputortestnet--other-scripts)
+  - [Run auto_tick.py for Consistent Ticks](#run-auto_tickpy-for-consistent-ticks)
+
 # System Recommendations
 
 ## Host Machine Requirements
