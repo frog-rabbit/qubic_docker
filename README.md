@@ -2,6 +2,29 @@
 
 This repository contains all the scripts and Dockerfiles necessary for launching a Qubic testnet node via Docker.
 
+# System Recommendations
+
+## Host Machine Requirements
+- **Linux**: A desktop environment is required (not just a server installation). This setup won't work on a headless Ubuntu server without a display manager, as you need a graphical environment to see the output or connect remotely to the virtual Qubic system running inside Docker.
+  
+  Example for Ubuntu Server: Install at least xubuntu-desktop with lightdm, which is a light display manager better suited for Xfce, LXQt or minimal setups:
+  ```bash
+  sudo apt update
+  sudo apt install xubuntu-desktop lightdm
+  ```
+
+## Remote Connection Options
+If you're connecting to the Qubic node from a remote machine, you'll need appropriate RDP client software:
+
+- **Windows**: Use the built-in Remote Desktop Connection
+- **macOS**: Install XQuartz and freerdp:
+  ```bash
+  brew install freerdp
+  # XQuartz provides an XServer for macOS:
+  brew install --cask xquartz
+  ```
+- **Linux**: Install freerdp as shown in the "See the Output with RDP" section below
+
 # Quick Approach with run.sh
 
 ## Prerequisites
@@ -163,16 +186,21 @@ Both the approach to use ./run.sh or the manual docker build will need these add
 
 ## See the Output with RDP (Optional)
 
-Install `xfreerdp` on your host:
+### For Linux hosts
+Install `xfreerdp`:
 
 ```bash
 sudo apt update && sudo apt install -y freerdp2-x11
 ```
 
-Then connect:
+### Connecting from any OS
+Connect to the VM using RDP:
 
 ```bash
+# Linux/macOS with freerdp
 xfreerdp /v:127.0.0.1:5000 /u: /p: /cert:ignore
+
+# Windows: use Remote Desktop Connection to connect to 127.0.0.1:5000
 ```
 
 This should show you the headless VM console, assuming the Extension Pack is installed and VRDE is enabled in `entrypoint.sh`. Now you can even interact with the VM output as if you're running the VM from your host machine. Any keyboard inputs like Esc, F2, F4, F9, etc. will be sent to the VM in the docker.
